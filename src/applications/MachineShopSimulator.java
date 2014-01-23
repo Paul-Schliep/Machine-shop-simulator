@@ -16,71 +16,14 @@ public class MachineShopSimulator {
    
   
     // data members of MachineShopSimulator
-    private static int timeNow; // current time
+    static int timeNow; // current time
     private static int numMachines; // number of machines
     private static int numJobs; // number of jobs
-    private static EventList eList; // pointer to event list
-    private static Machine[] machine; // array of machines
-    private static int largeTime; // all machines finish before this
+    static EventList eList; // pointer to event list
+    static Machine[] machine; // array of machines
+    static int largeTime; // all machines finish before this
 
     // methods
-    /**
-     * move theJob to machine for its next task
-     * 
-     * @return false iff no next task
-     */
-    static boolean moveToNextMachine(Job theJob) {
-        if (theJob.taskQ.isEmpty()) {// no next task
-            System.out.println("Job " + theJob.id + " has completed at "
-                    + timeNow + " Total wait was " + (timeNow - theJob.length));
-            return false;
-        } else {// theJob has a next task
-                // get machine for next task
-            int p = ((Task) theJob.taskQ.getFrontElement()).machine;
-            // put on machine p's wait queue
-            machine[p].jobQ.put(theJob);
-            theJob.arrivalTime = timeNow;
-            // if p idle, schedule immediately
-            if (eList.nextEventTime(p) == largeTime) {// machine is idle
-                changeState(p);
-            }
-            return true;
-        }
-    }
-
-    /**
-     * change the state of theMachine
-     * 
-     * @return last job run on this machine
-     */
-    static Job changeState(int theMachine) {// Task on theMachine has finished,
-                                            // schedule next one.
-        Job lastJob;
-        if (machine[theMachine].activeJob == null) {// in idle or change-over
-                                                    // state
-            lastJob = null;
-            // wait over, ready for new job
-            if (machine[theMachine].jobQ.isEmpty()) // no waiting job
-                eList.setFinishTime(theMachine, largeTime);
-            else {// take job off the queue and work on it
-                machine[theMachine].activeJob = (Job) machine[theMachine].jobQ
-                        .remove();
-                machine[theMachine].totalWait += timeNow
-                        - machine[theMachine].activeJob.arrivalTime;
-                machine[theMachine].numTasks++;
-                int t = machine[theMachine].activeJob.removeNextTask();
-                eList.setFinishTime(theMachine, timeNow + t);
-            }
-        } else {// task has just finished on machine[theMachine]
-                // schedule change-over time
-            lastJob = machine[theMachine].activeJob;
-            machine[theMachine].activeJob = null;
-            eList.setFinishTime(theMachine, timeNow
-                    + machine[theMachine].changeTime);
-        }
-
-        return lastJob;
-    }
 
     /** input machine shop data */
     static void inputData() {
@@ -138,7 +81,7 @@ public class MachineShopSimulator {
     /** load first jobs onto each machine */
     static void startShop() {
         for (int p = 1; p <= numMachines; p++)
-            changeState(p);
+            Machine.changeState(p);
     }
 
     /** process all jobs to completion */
@@ -147,10 +90,10 @@ public class MachineShopSimulator {
             int nextToFinish = eList.nextEventMachine();
             timeNow = eList.nextEventTime(nextToFinish);
             // change job on machine nextToFinish
-            Job theJob = changeState(nextToFinish);
+            Job theJob = Machine.changeState(nextToFinish);
             // move theJob to its next machine
             // decrement numJobs if theJob has finished
-            if (theJob != null && !moveToNextMachine(theJob))
+            if (theJob != null && !Job.moveToNextMachine(theJob))
                 numJobs--;
         }
     }
