@@ -3,7 +3,6 @@
 package applications;
 
 import utilities.MyInputStream;
-import dataStructures.LinkedQueue;
 import exceptions.MyInputException;
 
 public class MachineShopSimulator {
@@ -13,106 +12,9 @@ public class MachineShopSimulator {
     public static final String CHANGE_OVER_TIME_MUST_BE_AT_LEAST_0 = "change-over time must be >= 0";
     public static final String EACH_JOB_MUST_HAVE_AT_LEAST_1_TASK = "each job must have >= 1 task";
     public static final String BAD_MACHINE_NUMBER_OR_TASK_TIME = "bad machine number or task time";
-    
-    // top-level nested classes
-    private static class Task {
-        // data members
-        private int machine;
-        private int time;
 
-        // constructor
-        private Task(int theMachine, int theTime) {
-            machine = theMachine;
-            time = theTime;
-        }
-    }
-
-    private static class Job {
-        // data members
-        private LinkedQueue taskQ; // this job's tasks
-        private int length; // sum of scheduled task times
-        private int arrivalTime; // arrival time at current queue
-        private int id; // job identifier
-
-        // constructor
-        private Job(int theId) {
-            id = theId;
-            taskQ = new LinkedQueue();
-            // length and arrivalTime have default value 0
-        }
-
-        // other methods
-        private void addTask(int theMachine, int theTime) {
-            taskQ.put(new Task(theMachine, theTime));
-        }
-
-        /**
-         * remove next task of job and return its time also update length
-         */
-        private int removeNextTask() {
-            int theTime = ((Task) taskQ.remove()).time;
-            length += theTime;
-            return theTime;
-        }
-    }
-
-    private static class Machine {
-        // data members
-        LinkedQueue jobQ; // queue of waiting jobs for this machine
-        int changeTime; // machine change-over time
-        int totalWait; // total delay at this machine
-        int numTasks; // number of tasks processed on this machine
-        Job activeJob; // job currently active on this machine
-
-        // constructor
-        private Machine() {
-            jobQ = new LinkedQueue();
-        }
-    }
-
-    private static class EventList {
-        // data members
-        int[] finishTime; // finish time array
-
-        // constructor
-        private EventList(int theNumMachines, int theLargeTime) {// initialize
-                                                                 // finish
-                                                                 // times for
-                                                                 // m
-                                                                 // machines
-            if (theNumMachines < 1)
-                throw new IllegalArgumentException(NUMBER_OF_MACHINES_MUST_BE_AT_LEAST_1);
-            finishTime = new int[theNumMachines + 1];
-
-            // all machines are idle, initialize with
-            // large finish time
-            for (int i = 1; i <= theNumMachines; i++)
-                finishTime[i] = theLargeTime;
-        }
-
-        /** @return machine for next event */
-        private int nextEventMachine() {
-            // find first machine to finish, this is the
-            // machine with smallest finish time
-            int p = 1;
-            int t = finishTime[1];
-            for (int i = 2; i < finishTime.length; i++)
-                if (finishTime[i] < t) {// i finishes earlier
-                    p = i;
-                    t = finishTime[i];
-                }
-            return p;
-        }
-
-        private int nextEventTime(int theMachine) {
-            return finishTime[theMachine];
-        }
-
-        private void setFinishTime(int theMachine, int theTime) {
-            finishTime[theMachine] = theTime;
-        }
-    }
-
+   
+  
     // data members of MachineShopSimulator
     private static int timeNow; // current time
     private static int numMachines; // number of machines
