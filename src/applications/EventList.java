@@ -6,11 +6,8 @@ public class EventList {
     public static final String NUMBER_OF_MACHINES_MUST_BE_AT_LEAST_1 = "number of machines must be >= 1";
 
     // constructor
-    EventList(int theNumMachines, int theLargeTime) {// initialize
-                                                             // finish
-                                                             // times for
-                                                             // m
-                                                             // machines
+    EventList(int theNumMachines, int theLargeTime) {
+        
         if (theNumMachines < 1)
             throw new IllegalArgumentException(NUMBER_OF_MACHINES_MUST_BE_AT_LEAST_1);
         finishTime = new int[theNumMachines + 1];

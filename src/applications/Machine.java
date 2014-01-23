@@ -24,27 +24,28 @@ public class Machine {
     static Job changeState(int theMachine) {// Task on theMachine has finished,
                                             // schedule next one.
         Job lastJob;
-        if (MachineShopSimulator.machine[theMachine].activeJob == null) {// in idle or change-over
+        Machine currentMachine = MachineShopSimulator.machine[theMachine];
+        if (currentMachine.activeJob == null) {// in idle or change-over
                                                     // state
             lastJob = null;
             // wait over, ready for new job
-            if (MachineShopSimulator.machine[theMachine].jobQ.isEmpty()) // no waiting job
+            if (currentMachine.jobQ.isEmpty()) // no waiting job
                 MachineShopSimulator.eList.setFinishTime(theMachine, MachineShopSimulator.largeTime);
             else {// take job off the queue and work on it
-                MachineShopSimulator.machine[theMachine].activeJob = (Job) MachineShopSimulator.machine[theMachine].jobQ
+                currentMachine.activeJob = (Job) currentMachine.jobQ
                         .remove();
-                MachineShopSimulator.machine[theMachine].totalWait += MachineShopSimulator.timeNow
-                        - MachineShopSimulator.machine[theMachine].activeJob.arrivalTime;
-                MachineShopSimulator.machine[theMachine].numTasks++;
-                int t = MachineShopSimulator.machine[theMachine].activeJob.removeNextTask();
+                currentMachine.totalWait += MachineShopSimulator.timeNow
+                        - currentMachine.activeJob.arrivalTime;
+                currentMachine.numTasks++;
+                int t = currentMachine.activeJob.removeNextTask();
                 MachineShopSimulator.eList.setFinishTime(theMachine, MachineShopSimulator.timeNow + t);
             }
         } else {// task has just finished on machine[theMachine]
                 // schedule change-over time
-            lastJob = MachineShopSimulator.machine[theMachine].activeJob;
-            MachineShopSimulator.machine[theMachine].activeJob = null;
+            lastJob = currentMachine.activeJob;
+            currentMachine.activeJob = null;
             MachineShopSimulator.eList.setFinishTime(theMachine, MachineShopSimulator.timeNow
-                    + MachineShopSimulator.machine[theMachine].changeTime);
+                    + currentMachine.changeTime);
         }
 
         return lastJob;
