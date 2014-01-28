@@ -21,26 +21,15 @@ public class Machine {
      * 
      * @return last job run on this machine
      */
-    static Job changeState(int theMachine) {// Task on theMachine has finished,
+    public static Job changeState(int theMachine) {// Task on theMachine has finished,
                                             // schedule next one.
         Job lastJob;
-        Machine currentMachine = MachineShopSimulator.getMachine()[theMachine];
+        Machine currentMachine = MachineShopSimulator.getMachine(theMachine);
         if (currentMachine.activeJob == null) {// in idle or change-over
                                                     // state
             lastJob = null;
             // wait over, ready for new job
-            if (currentMachine.getJobQ().isEmpty()) // no waiting job
-                MachineShopSimulator.geteList().setFinishTime(theMachine, MachineShopSimulator.getLargeTime());
-            else {// take job off the queue and work on it
-                currentMachine.activeJob = (Job) currentMachine.getJobQ()
-                        .remove();
-                currentMachine.totalWait = (currentMachine.totalWait
-                        + (MachineShopSimulator.getTimeNow()
-                                - currentMachine.activeJob.getArrivalTime()));
-                currentMachine.numTasks = (currentMachine.getNumTasks() + 1);
-                int t = currentMachine.activeJob.removeNextTask();
-                MachineShopSimulator.geteList().setFinishTime(theMachine, MachineShopSimulator.getTimeNow() + t);
-            }
+            currentMachine.getNewJob(theMachine);
         } else {// task has just finished on machine[theMachine]
                 // schedule change-over time
             lastJob = currentMachine.activeJob;
@@ -50,6 +39,22 @@ public class Machine {
         }
 
         return lastJob;
+    }
+
+
+    private void getNewJob(int theMachine) {
+        if (this.getJobQ().isEmpty()) // no waiting job
+            MachineShopSimulator.geteList().setFinishTime(theMachine, MachineShopSimulator.getLargeTime());
+        else {// take job off the queue and work on it
+            this.activeJob = (Job) this.getJobQ()
+                    .remove();
+            this.totalWait = (this.totalWait
+                    + (MachineShopSimulator.getTimeNow()
+                            - this.activeJob.getArrivalTime()));
+            this.numTasks = (this.getNumTasks() + 1);
+            int t = this.activeJob.removeNextTask();
+            MachineShopSimulator.geteList().setFinishTime(theMachine, MachineShopSimulator.getTimeNow() + t);
+        }
     }
 
 

@@ -40,7 +40,7 @@ public class MachineShopSimulator {
         eList = new EventList(numMachines, getLargeTime());
         machine = new Machine[numMachines + 1];
         for (int i = 1; i <= numMachines; i++)
-            getMachine()[i] = new Machine();
+            machine[i] = new Machine();
 
         // input the change-over times
         System.out.println("Enter change-over times for machines");
@@ -48,7 +48,7 @@ public class MachineShopSimulator {
             int ct = keyboard.readInteger();
             if (ct < 0)
                 throw new MyInputException(CHANGE_OVER_TIME_MUST_BE_AT_LEAST_0);
-            getMachine()[j].setChangeTime(ct);
+            getMachine(j).setChangeTime(ct);
         }
 
         // input the jobs
@@ -74,13 +74,14 @@ public class MachineShopSimulator {
                     firstMachine = theMachine; // job's first machine
                 theJob.addTask(theMachine, theTaskTime); // add to
             } // task queue
-            getMachine()[firstMachine].getJobQ().put(theJob);
+            getMachine(firstMachine).getJobQ().put(theJob);
         }
     }
 
     /** load first jobs onto each machine */
     static void startShop() {
         for (int p = 1; p <= numMachines; p++)
+            
             Machine.changeState(p);
     }
 
@@ -103,9 +104,9 @@ public class MachineShopSimulator {
         System.out.println("Finish time = " + getTimeNow());
         for (int p = 1; p <= numMachines; p++) {
             System.out.println("Machine " + p + " completed "
-                    + getMachine()[p].getNumTasks() + " tasks");
+                    + getMachine(p).getNumTasks() + " tasks");
             System.out.println("The total wait time was "
-                    + getMachine()[p].getTotalWait());
+                    + getMachine(p).getTotalWait());
             System.out.println();
         }
     }
@@ -126,8 +127,8 @@ public class MachineShopSimulator {
         outputStatistics(); // output machine wait times
     }
 
-    public static Machine[] getMachine() {
-        return machine;
+    public static Machine getMachine(int theMachine) {
+        return machine[theMachine];
     }
 
     public static EventList geteList() {
