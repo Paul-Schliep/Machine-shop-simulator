@@ -4,10 +4,10 @@ import dataStructures.LinkedQueue;
 
 public class Job {
     // data members
-    LinkedQueue taskQ; // this job's tasks
-    int length; // sum of scheduled task times
-    int arrivalTime; // arrival time at current queue
-    int id; // job identifier
+    private LinkedQueue taskQ; // this job's tasks
+    private int length; // sum of scheduled task times
+    private int arrivalTime; // arrival time at current queue
+    private int id; // job identifier
 
     // constructor
     Job(int theId) {
@@ -25,7 +25,7 @@ public class Job {
      * remove next task of job and return its time also update length
      */
     int removeNextTask() {
-        int theTime = ((Task) taskQ.remove()).time;
+        int theTime = ((Task) taskQ.remove()).getTime();
         length += theTime;
         return theTime;
     }
@@ -39,19 +39,24 @@ public class Job {
     static boolean moveToNextMachine(Job theJob) {
         if (theJob.taskQ.isEmpty()) {// no next task
             System.out.println("Job " + theJob.id + " has completed at "
-                    + MachineShopSimulator.timeNow + " Total wait was " + (MachineShopSimulator.timeNow - theJob.length));
+                    + MachineShopSimulator.getTimeNow() + " Total wait was " + (MachineShopSimulator.getTimeNow() - theJob.length));
             return false;
         }
         // get machine for next task
-         int p = ((Task) theJob.taskQ.getFrontElement()).machine;
+         int p = ((Task) theJob.taskQ.getFrontElement()).getMachine();
          // put on machine p's wait queue
-         MachineShopSimulator.machine[p].getJobQ().put(theJob);
-         theJob.arrivalTime = MachineShopSimulator.timeNow;
+         MachineShopSimulator.getMachine()[p].getJobQ().put(theJob);
+         theJob.arrivalTime = MachineShopSimulator.getTimeNow();
          // if p idle, schedule immediately
-         if (MachineShopSimulator.eList.nextEventTime(p) == MachineShopSimulator.largeTime) {// machine is idle
+         if (MachineShopSimulator.geteList().nextEventTime(p) == MachineShopSimulator.getLargeTime()) {// machine is idle
         Machine.changeState(p);
          }
          return true;
     }
+
+    public int getArrivalTime() {
+        return arrivalTime;
+    }
+
     
 }

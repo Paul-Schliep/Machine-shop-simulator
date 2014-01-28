@@ -2,7 +2,7 @@ package applications;
 
 public class EventList {
     // data members
-    int[] finishTime; // finish time array
+    private int[] finishTime; // finish time array
     public static final String NUMBER_OF_MACHINES_MUST_BE_AT_LEAST_1 = "number of machines must be >= 1";
 
     // constructor
