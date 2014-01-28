@@ -80,9 +80,11 @@ public class MachineShopSimulator {
 
     /** load first jobs onto each machine */
     static void startShop() {
-        for (int p = 1; p <= numMachines; p++)
+        for (int p = 1; p <= numMachines; p++){
+            Machine currentMachine = MachineShopSimulator.getMachine(p);
+            currentMachine.changeState();
             
-            Machine.changeState(p);
+        }
     }
 
     /** process all jobs to completion */
@@ -91,10 +93,13 @@ public class MachineShopSimulator {
             int nextToFinish = geteList().nextEventMachine();
             timeNow = geteList().nextEventTime(nextToFinish);
             // change job on machine nextToFinish
-            Job theJob = Machine.changeState(nextToFinish);
+            
+            Machine currentMachine = MachineShopSimulator.getMachine(nextToFinish);
+            
+            Job theJob = currentMachine.changeState();
             // move theJob to its next machine
             // decrement numJobs if theJob has finished
-            if (theJob != null && !Job.moveToNextMachine(theJob))
+            if (theJob != null && !theJob.moveToNextMachine())
                 numJobs--;
         }
     }
@@ -142,4 +147,14 @@ public class MachineShopSimulator {
     public static int getTimeNow() {
         return timeNow;
     }
+    
+    public static int getMachineNumber(Machine aMachine){
+        int machineNumber = -1;
+        for (int i=0; i<machine.length; i++)
+        {
+            if(machine[i] == aMachine) machineNumber = i;
+        }
+        return machineNumber;
+    }
+    
 }

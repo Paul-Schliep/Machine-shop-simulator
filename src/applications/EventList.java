@@ -36,7 +36,7 @@ public class EventList {
         return finishTime[theMachine];
     }
 
-    void setFinishTime(int theMachine, int theTime) {
-        finishTime[theMachine] = theTime;
+    void setFinishTime(Machine theMachine, int theTime) {
+        finishTime[MachineShopSimulator.getMachineNumber(theMachine)] = theTime;
     }
 }
