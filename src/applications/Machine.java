@@ -4,15 +4,15 @@ import dataStructures.LinkedQueue;
 
 public class Machine {
     // data members
-    LinkedQueue jobQ; // queue of waiting jobs for this machine
-    int changeTime; // machine change-over time
-    int totalWait; // total delay at this machine
-    int numTasks; // number of tasks processed on this machine
-    Job activeJob; // job currently active on this machine
+    private LinkedQueue jobQ; // queue of waiting jobs for this machine
+    private int changeTime; // machine change-over time
+    private int totalWait; // total delay at this machine
+    private int numTasks; // number of tasks processed on this machine
+    private Job activeJob; // job currently active on this machine
 
     // constructor
     public Machine() {
-        jobQ = new LinkedQueue();
+        this.jobQ = new LinkedQueue();
     }
     
     
@@ -29,14 +29,15 @@ public class Machine {
                                                     // state
             lastJob = null;
             // wait over, ready for new job
-            if (currentMachine.jobQ.isEmpty()) // no waiting job
+            if (currentMachine.getJobQ().isEmpty()) // no waiting job
                 MachineShopSimulator.eList.setFinishTime(theMachine, MachineShopSimulator.largeTime);
             else {// take job off the queue and work on it
-                currentMachine.activeJob = (Job) currentMachine.jobQ
+                currentMachine.activeJob = (Job) currentMachine.getJobQ()
                         .remove();
-                currentMachine.totalWait += MachineShopSimulator.timeNow
-                        - currentMachine.activeJob.arrivalTime;
-                currentMachine.numTasks++;
+                currentMachine.totalWait = (currentMachine.totalWait
+                        + (MachineShopSimulator.timeNow
+                                - currentMachine.activeJob.arrivalTime));
+                currentMachine.numTasks = (currentMachine.getNumTasks() + 1);
                 int t = currentMachine.activeJob.removeNextTask();
                 MachineShopSimulator.eList.setFinishTime(theMachine, MachineShopSimulator.timeNow + t);
             }
@@ -45,10 +46,34 @@ public class Machine {
             lastJob = currentMachine.activeJob;
             currentMachine.activeJob = null;
             MachineShopSimulator.eList.setFinishTime(theMachine, MachineShopSimulator.timeNow
-                    + currentMachine.changeTime);
+                    + currentMachine.getChangeTime());
         }
 
         return lastJob;
     }
-    
+
+
+    public LinkedQueue getJobQ() {
+        return jobQ;
+    }
+
+
+    public int getChangeTime() {
+        return changeTime;
+    }
+
+
+    public void setChangeTime(int changeTime) {
+        this.changeTime = changeTime;
+    }
+
+
+    public int getNumTasks() {
+        return numTasks;
+    }
+
+
+    public int getTotalWait() {
+        return totalWait;
+    }
 }
