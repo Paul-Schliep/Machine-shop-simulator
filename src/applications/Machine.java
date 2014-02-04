@@ -9,10 +9,12 @@ public class Machine {
     private int totalWait; // total delay at this machine
     private int numTasks; // number of tasks processed on this machine
     private Job activeJob; // job currently active on this machine
+    private int id; // the machine's id number
 
     // constructor
-    public Machine() {
+    public Machine(int id) {
         this.jobQ = new LinkedQueue();
+        this.id = id;
     }
     
     
@@ -34,7 +36,7 @@ public class Machine {
         else {
             lastJob = this.activeJob;
             this.activeJob = null;
-            MachineShopSimulator.setFinishTime(this, this.getChangeTime());
+            MachineShopSimulator.setFinishTime(id, this.getChangeTime());
         }
 
         return lastJob;
@@ -44,7 +46,7 @@ public class Machine {
     private void getNewJob() {
         // no waiting job
         if (this.getJobQ().isEmpty())
-            MachineShopSimulator.noMoreJobs(this);
+            MachineShopSimulator.noMoreJobs(id);
         
         // take job off the queue and work on it
         else {
@@ -56,7 +58,7 @@ public class Machine {
             this.numTasks = (this.getNumTasks() + 1);
             
             int time = this.activeJob.removeNextTask();
-            MachineShopSimulator.setFinishTime(this, time);
+            MachineShopSimulator.setFinishTime(id, time);
         }
     }
 
@@ -84,5 +86,4 @@ public class Machine {
     public int getTotalWait() {
         return totalWait;
     }
-    
 }

@@ -40,7 +40,7 @@ public class MachineShopSimulator {
         eventList = new EventList(numMachines, largeTime);
         machine = new Machine[numMachines + 1];
         for (int i = 1; i <= numMachines; i++)
-            machine[i] = new Machine();
+            machine[i] = new Machine(i);
 
         // input the change-over times
         System.out.println("Enter change-over times for machines");
@@ -140,12 +140,12 @@ public class MachineShopSimulator {
         return timeNow;
     }
     
-    public static void setFinishTime(Machine theMachine, int time) {
-        eventList.setFinishTime(theMachine, timeNow + time);
+    public static void setFinishTime(int machineId, int time) {
+        eventList.setFinishTime(machineId, timeNow + time);
     }
     
-    public static void noMoreJobs(Machine theMachine) {
-        eventList.setFinishTime(theMachine, largeTime);
+    public static void noMoreJobs(int machineId) {
+        eventList.setFinishTime(machineId, largeTime);
     }
     
     public static boolean isJobIdle(int p){
@@ -155,16 +155,6 @@ public class MachineShopSimulator {
     public static void jobDone(int jobID, int jobLength){
         System.out.println("Job " + jobID + " has completed at "
                 + timeNow + " Total wait was " + (timeNow - jobLength));
-    }
-    
-    
-    public static int getMachineNumber(Machine aMachine){
-        int machineNumber = -1;
-        for (int i=0; i<machine.length; i++)
-        {
-            if(machine[i] == aMachine) machineNumber = i;
-        }
-        return machineNumber;
     }
     
 }
