@@ -37,7 +37,7 @@ public class MachineShopSimulator {
             throw new MyInputException(NUMBER_OF_MACHINES_AND_JOBS_MUST_BE_AT_LEAST_1);
 
         // create event and machine queues
-        eList = new EventList(numMachines, getLargeTime());
+        eList = new EventList(numMachines, largeTime);
         machine = new Machine[numMachines + 1];
         for (int i = 1; i <= numMachines; i++)
             machine[i] = new Machine();
@@ -136,10 +136,6 @@ public class MachineShopSimulator {
         return machine[theMachine];
     }
     
-    public static int getLargeTime() {
-        return largeTime;
-    }
-
     public static int getTimeNow() {
         return timeNow;
     }
@@ -154,6 +150,10 @@ public class MachineShopSimulator {
     
     public static void noMoreJobs(Machine theMachine) {
         eList.setFinishTime(theMachine, largeTime);
+    }
+    
+    public static boolean isJobIdle(int p){
+        return eList.nextEventTime(p) == largeTime;
     }
     
     public static void jobDone(int jobID, int jobLength){

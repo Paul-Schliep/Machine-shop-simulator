@@ -50,7 +50,7 @@ public class Job {
 
     private void checkIdle(int p) {
         // machine is idle
-        if (MachineShopSimulator.getEventList().nextEventTime(p) == MachineShopSimulator.getLargeTime()) {
+        if (MachineShopSimulator.isJobIdle(p)) {
              Machine currentMachine = MachineShopSimulator.getMachine(p);
              currentMachine.changeState();
          }
