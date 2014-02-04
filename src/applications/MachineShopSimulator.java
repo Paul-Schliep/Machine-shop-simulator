@@ -20,7 +20,7 @@ public class MachineShopSimulator {
     private static int numMachines; // number of machines
     private static int numJobs; // number of jobs
     private static EventList eventList; // pointer to event list
-    private static Machine[] machine; // array of machines
+    private static Machine[] machines; // array of machines
     private static int largeTime; // all machines finish before this
 
     // methods
@@ -38,9 +38,9 @@ public class MachineShopSimulator {
 
         // create event and machine queues
         eventList = new EventList(numMachines, largeTime);
-        machine = new Machine[numMachines + 1];
+        machines = new Machine[numMachines + 1];
         for (int i = 1; i <= numMachines; i++)
-            machine[i] = new Machine(i);
+            machines[i] = new Machine(i);
 
         // input the change-over times
         System.out.println("Enter change-over times for machines");
@@ -106,13 +106,11 @@ public class MachineShopSimulator {
 
     /** output wait times at machines */
     static void outputStatistics() {
+        Machine theMachine;
         System.out.println("Finish time = " + timeNow);
         for (int p = 1; p <= numMachines; p++) {
-            System.out.println("Machine " + p + " completed "
-                    + getMachine(p).getNumTasks() + " tasks");
-            System.out.println("The total wait time was "
-                    + getMachine(p).getTotalWait());
-            System.out.println();
+            theMachine = machines[p];
+            theMachine.stats();
         }
     }
 
@@ -133,7 +131,7 @@ public class MachineShopSimulator {
     }
 
     public static Machine getMachine(int theMachine) {
-        return machine[theMachine];
+        return machines[theMachine];
     }
     
     public static int getTimeNow() {

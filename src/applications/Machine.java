@@ -43,7 +43,7 @@ public class Machine {
         else {
             lastJob = this.activeJob;
             this.activeJob = null;
-            MachineShopSimulator.setFinishTime(id, this.getChangeTime());
+            MachineShopSimulator.setFinishTime(id, this.changeTime);
         }
 
         return lastJob;
@@ -61,7 +61,7 @@ public class Machine {
             this.totalWait = (this.totalWait
                     + (MachineShopSimulator.getTimeNow()
                             - this.activeJob.getArrivalTime()));
-            this.numTasks = (this.getNumTasks() + 1);
+            this.numTasks = (this.numTasks + 1);
             
             int time = this.activeJob.removeNextTask();
             MachineShopSimulator.setFinishTime(id, time);
@@ -72,22 +72,15 @@ public class Machine {
         jobQ.put(theJob);
     }
 
-    public int getChangeTime() {
-        return changeTime;
-    }
-
-
     public void setChangeTime(int changeTime) {
         this.changeTime = changeTime;
     }
-
-
-    public int getNumTasks() {
-        return numTasks;
-    }
-
-
-    public int getTotalWait() {
-        return totalWait;
+    
+    public void stats() {
+        System.out.println("Machine " + id + " completed "
+                + numTasks + " tasks");
+        System.out.println("The total wait time was "
+                + totalWait);
+        System.out.println();
     }
 }
