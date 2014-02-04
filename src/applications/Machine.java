@@ -18,6 +18,13 @@ public class Machine {
     }
     
     
+    public void checkIdle() {
+        // machine is idle, schedule!
+        if (MachineShopSimulator.isMachineIdle(id)) {
+             this.changeState();
+         }
+    }
+    
     /**
      * change the state of theMachine
      * 
@@ -42,15 +49,14 @@ public class Machine {
         return lastJob;
     }
 
-
     private void getNewJob() {
         // no waiting job
-        if (this.getJobQ().isEmpty())
+        if (this.jobQ.isEmpty())
             MachineShopSimulator.noMoreJobs(id);
         
         // take job off the queue and work on it
         else {
-            this.activeJob = (Job) this.getJobQ()
+            this.activeJob = (Job) this.jobQ
                     .remove();
             this.totalWait = (this.totalWait
                     + (MachineShopSimulator.getTimeNow()
@@ -62,11 +68,9 @@ public class Machine {
         }
     }
 
-
-    public LinkedQueue getJobQ() {
-        return jobQ;
+    public void addJob(Job theJob){
+        jobQ.put(theJob);
     }
-
 
     public int getChangeTime() {
         return changeTime;

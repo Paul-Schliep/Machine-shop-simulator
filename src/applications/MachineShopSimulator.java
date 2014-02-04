@@ -74,7 +74,7 @@ public class MachineShopSimulator {
                     firstMachine = theMachine; // job's first machine
                 theJob.addTask(theMachine, theTaskTime); // add to
             } // task queue
-            getMachine(firstMachine).getJobQ().put(theJob);
+            getMachine(firstMachine).addJob(theJob);
         }
     }
 
@@ -148,7 +148,7 @@ public class MachineShopSimulator {
         eventList.setFinishTime(machineId, largeTime);
     }
     
-    public static boolean isJobIdle(int p){
+    public static boolean isMachineIdle(int p){
         return eventList.nextEventTime(p) == largeTime;
     }
     

@@ -38,23 +38,17 @@ public class Job {
      */
     boolean moveToNextMachine() {
          if(hasNoActiveTask() == false) return false;
-        // get machine for next task
-         int p = ((Task) this.taskQ.getFrontElement()).getMachine();
+        // get machine for next task with Id
+         int nextMachineId = ((Task) this.taskQ.getFrontElement()).getMachineId();
+         Machine theMachine = MachineShopSimulator.getMachine(nextMachineId);
          // put on machine p's wait queue
-         MachineShopSimulator.getMachine(p).getJobQ().put(this);
+         theMachine.addJob(this);
          this.arrivalTime = MachineShopSimulator.getTimeNow();
          // if p idle, schedule immediately
-         checkIdle(p);
+         theMachine.checkIdle();
          return true;
     }
 
-    private void checkIdle(int p) {
-        // machine is idle
-        if (MachineShopSimulator.isJobIdle(p)) {
-             Machine currentMachine = MachineShopSimulator.getMachine(p);
-             currentMachine.changeState();
-         }
-    }
 
     private boolean hasNoActiveTask() {
         if (this.taskQ.isEmpty()) {// no next task
