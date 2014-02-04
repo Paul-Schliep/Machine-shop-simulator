@@ -19,7 +19,7 @@ public class MachineShopSimulator {
     private static int timeNow; // current time
     private static int numMachines; // number of machines
     private static int numJobs; // number of jobs
-    private static EventList eList; // pointer to event list
+    private static EventList eventList; // pointer to event list
     private static Machine[] machine; // array of machines
     private static int largeTime; // all machines finish before this
 
@@ -37,7 +37,7 @@ public class MachineShopSimulator {
             throw new MyInputException(NUMBER_OF_MACHINES_AND_JOBS_MUST_BE_AT_LEAST_1);
 
         // create event and machine queues
-        eList = new EventList(numMachines, largeTime);
+        eventList = new EventList(numMachines, largeTime);
         machine = new Machine[numMachines + 1];
         for (int i = 1; i <= numMachines; i++)
             machine[i] = new Machine();
@@ -90,8 +90,8 @@ public class MachineShopSimulator {
     /** process all jobs to completion */
     static void simulate() {
         while (numJobs > 0) {// at least one job left
-            int nextToFinish = getEventList().nextEventMachine();
-            timeNow = getEventList().nextEventTime(nextToFinish);
+            int nextToFinish = eventList.nextEventMachine();
+            timeNow = eventList.nextEventTime(nextToFinish);
             // change job on machine nextToFinish
             
             Machine currentMachine = MachineShopSimulator.getMachine(nextToFinish);
@@ -106,7 +106,7 @@ public class MachineShopSimulator {
 
     /** output wait times at machines */
     static void outputStatistics() {
-        System.out.println("Finish time = " + getTimeNow());
+        System.out.println("Finish time = " + timeNow);
         for (int p = 1; p <= numMachines; p++) {
             System.out.println("Machine " + p + " completed "
                     + getMachine(p).getNumTasks() + " tasks");
@@ -139,21 +139,17 @@ public class MachineShopSimulator {
     public static int getTimeNow() {
         return timeNow;
     }
-
-    public static EventList getEventList() {
-        return eList;
-    }
     
     public static void setFinishTime(Machine theMachine, int time) {
-        eList.setFinishTime(theMachine, timeNow + time);
+        eventList.setFinishTime(theMachine, timeNow + time);
     }
     
     public static void noMoreJobs(Machine theMachine) {
-        eList.setFinishTime(theMachine, largeTime);
+        eventList.setFinishTime(theMachine, largeTime);
     }
     
     public static boolean isJobIdle(int p){
-        return eList.nextEventTime(p) == largeTime;
+        return eventList.nextEventTime(p) == largeTime;
     }
     
     public static void jobDone(int jobID, int jobLength){
