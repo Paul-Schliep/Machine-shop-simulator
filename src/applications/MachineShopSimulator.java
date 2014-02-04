@@ -90,8 +90,8 @@ public class MachineShopSimulator {
     /** process all jobs to completion */
     static void simulate() {
         while (numJobs > 0) {// at least one job left
-            int nextToFinish = geteList().nextEventMachine();
-            timeNow = geteList().nextEventTime(nextToFinish);
+            int nextToFinish = getEventList().nextEventMachine();
+            timeNow = getEventList().nextEventTime(nextToFinish);
             // change job on machine nextToFinish
             
             Machine currentMachine = MachineShopSimulator.getMachine(nextToFinish);
@@ -136,8 +136,13 @@ public class MachineShopSimulator {
         return machine[theMachine];
     }
 
-    public static EventList geteList() {
+    public static EventList getEventList() {
         return eList;
+    }
+    
+    public static void setEventFinishTime(Machine currentMachine, int time) {
+        
+        eList.setFinishTime(currentMachine, MachineShopSimulator.getTimeNow() + time);
     }
 
     public static int getLargeTime() {
