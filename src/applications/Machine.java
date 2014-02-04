@@ -21,20 +21,20 @@ public class Machine {
      * 
      * @return last job run on this machine
      */
-    public Job changeState() {// Task on theMachine has finished,
-                                            // schedule next one.
+    public Job changeState() {
         Job lastJob;
-        if (this.activeJob == null) {// in idle or change-over
-                                                    // state
+        // in idle or change-over state
+        if (this.activeJob == null) {
             lastJob = null;
             // wait over, ready for new job
             this.getNewJob();
-        } else {// task has just finished on machine[theMachine]
-                // schedule change-over time
+        } 
+        // task has just finished on machine[theMachine]
+        // schedule change-over time
+        else {
             lastJob = this.activeJob;
             this.activeJob = null;
-            MachineShopSimulator.getEventList().setFinishTime(this, MachineShopSimulator.getTimeNow()
-                    + this.getChangeTime());
+            MachineShopSimulator.setFinishTime(this, this.getChangeTime());
         }
 
         return lastJob;
@@ -42,9 +42,12 @@ public class Machine {
 
 
     private void getNewJob() {
-        if (this.getJobQ().isEmpty()) // no waiting job
-            MachineShopSimulator.getEventList().setFinishTime(this, MachineShopSimulator.getLargeTime());
-        else {// take job off the queue and work on it
+        // no waiting job
+        if (this.getJobQ().isEmpty())
+            MachineShopSimulator.noMoreJobs(this);
+        
+        // take job off the queue and work on it
+        else {
             this.activeJob = (Job) this.getJobQ()
                     .remove();
             this.totalWait = (this.totalWait
@@ -53,7 +56,7 @@ public class Machine {
             this.numTasks = (this.getNumTasks() + 1);
             
             int time = this.activeJob.removeNextTask();
-            MachineShopSimulator.setEventFinishTime(this, time);
+            MachineShopSimulator.setFinishTime(this, time);
         }
     }
 

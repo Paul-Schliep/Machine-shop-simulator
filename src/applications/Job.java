@@ -49,7 +49,8 @@ public class Job {
     }
 
     private void checkIdle(int p) {
-        if (MachineShopSimulator.getEventList().nextEventTime(p) == MachineShopSimulator.getLargeTime()) {// machine is idle
+        // machine is idle
+        if (MachineShopSimulator.getEventList().nextEventTime(p) == MachineShopSimulator.getLargeTime()) {
              Machine currentMachine = MachineShopSimulator.getMachine(p);
              currentMachine.changeState();
          }
@@ -57,8 +58,7 @@ public class Job {
 
     private boolean hasNoActiveTask() {
         if (this.taskQ.isEmpty()) {// no next task
-            System.out.println("Job " + this.id + " has completed at "
-                    + MachineShopSimulator.getTimeNow() + " Total wait was " + (MachineShopSimulator.getTimeNow() - this.length));
+            MachineShopSimulator.jobDone(id, length);
             return false;
         }
         return true;

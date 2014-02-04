@@ -135,16 +135,7 @@ public class MachineShopSimulator {
     public static Machine getMachine(int theMachine) {
         return machine[theMachine];
     }
-
-    public static EventList getEventList() {
-        return eList;
-    }
     
-    public static void setEventFinishTime(Machine currentMachine, int time) {
-        
-        eList.setFinishTime(currentMachine, MachineShopSimulator.getTimeNow() + time);
-    }
-
     public static int getLargeTime() {
         return largeTime;
     }
@@ -152,6 +143,24 @@ public class MachineShopSimulator {
     public static int getTimeNow() {
         return timeNow;
     }
+
+    public static EventList getEventList() {
+        return eList;
+    }
+    
+    public static void setFinishTime(Machine theMachine, int time) {
+        eList.setFinishTime(theMachine, timeNow + time);
+    }
+    
+    public static void noMoreJobs(Machine theMachine) {
+        eList.setFinishTime(theMachine, largeTime);
+    }
+    
+    public static void jobDone(int jobID, int jobLength){
+        System.out.println("Job " + jobID + " has completed at "
+                + timeNow + " Total wait was " + (timeNow - jobLength));
+    }
+    
     
     public static int getMachineNumber(Machine aMachine){
         int machineNumber = -1;
