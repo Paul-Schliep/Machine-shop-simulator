@@ -48,8 +48,8 @@ public class MachineShopSimulator {
 
     private static void setJobs(MyInputStream keyboard) {
         Job theJob;
-        for (int i = 1; i <= numJobs; i++) {
-            System.out.println("Enter number of tasks for job " + i);
+        for (int i = 0; i < numJobs; i++) {
+            System.out.println("Enter number of tasks for job " + (i+1));
             int tasks = keyboard.readInteger(); // number of tasks
             int firstMachine = 0; // machine for first task
             if (tasks < 1)
@@ -69,41 +69,38 @@ public class MachineShopSimulator {
         
         int theMachine, theTaskTime, firstMachine = -1;
             
-        for (int j = 1; j <= tasks; j++) {// get tasks for job i
-            theMachine = keyboard.readInteger();
+        for (int i = 0; i < tasks; i++) {// get tasks for job i
+            theMachine = keyboard.readInteger()-1;
             theTaskTime = keyboard.readInteger();
-            if (theMachine < 1 || theMachine > numMachines
+            if (theMachine < 0 || theMachine > numMachines
                     || theTaskTime < 1)
                 throw new MyInputException(BAD_MACHINE_NUMBER_OR_TASK_TIME);
-            if (j == 1)
-                firstMachine = theMachine; // job's first machine
+            if (i == 0) firstMachine = theMachine; // job's first machine
             theJob.addTask(theMachine, theTaskTime); // add to
         }
         return firstMachine;
     }
 
     private static void setChangeOverTime(MyInputStream keyboard) {
-        for (int j = 1; j <= numMachines; j++) {
+        for (int i = 0; i < numMachines; i++) {
             int ct = keyboard.readInteger();
             if (ct < 0)
                 throw new MyInputException(CHANGE_OVER_TIME_MUST_BE_AT_LEAST_0);
-            getMachine(j).setChangeTime(ct);
+            getMachine(i).setChangeTime(ct);
         }
     }
 
     private static void createEventAndMachines() {
         eventList = new EventList(numMachines, largeTime);
-        machines = new Machine[numMachines + 1];
-        for (int i = 1; i <= numMachines; i++)
-            machines[i] = new Machine(i);
+        machines = new Machine[numMachines];
+        for (int i = 0; i < numMachines; i++) machines[i] = new Machine(i);
     }
 
     /** load first jobs onto each machine */
     static void startShop() {
-        for (int p = 1; p <= numMachines; p++){
+        for (int p = 0; p < numMachines; p++){
             Machine currentMachine = MachineShopSimulator.getMachine(p);
             currentMachine.changeState();
-            
         }
     }
 
@@ -119,8 +116,7 @@ public class MachineShopSimulator {
             Job theJob = currentMachine.changeState();
             // move theJob to its next machine
             // decrement numJobs if theJob has finished
-            if (theJob != null && !theJob.moveToNextMachine())
-                numJobs--;
+            if (theJob != null && !theJob.moveToNextMachine()) numJobs--;
         }
     }
 
@@ -128,7 +124,7 @@ public class MachineShopSimulator {
     static void outputStatistics() {
         Machine theMachine;
         System.out.println("Finish time = " + timeNow);
-        for (int p = 1; p <= numMachines; p++) {
+        for (int p = 0; p < numMachines; p++) {
             theMachine = machines[p];
             theMachine.stats();
         }
@@ -171,7 +167,7 @@ public class MachineShopSimulator {
     }
     
     public static void jobDone(int jobID, int jobLength){
-        System.out.println("Job " + jobID + " has completed at "
+        System.out.println("Job " + (jobID+1) + " has completed at "
                 + timeNow + " Total wait was " + (timeNow - jobLength));
     }
     

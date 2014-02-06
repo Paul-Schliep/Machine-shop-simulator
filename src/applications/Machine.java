@@ -76,7 +76,7 @@ public class Machine {
     }
     
     public void stats() {
-        System.out.println("Machine " + id + " completed "
+        System.out.println("Machine " + (id+1) + " completed "
                 + numTasks + " tasks");
         System.out.println("The total wait time was "
                 + totalWait);
