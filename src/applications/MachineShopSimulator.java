@@ -7,7 +7,6 @@ import exceptions.MyInputException;
 
 public class MachineShopSimulator {
     
-    public static final String NUMBER_OF_MACHINES_MUST_BE_AT_LEAST_1 = "number of machines must be >= 1";
     public static final String NUMBER_OF_MACHINES_AND_JOBS_MUST_BE_AT_LEAST_1 = "number of machines and jobs must be >= 1";
     public static final String CHANGE_OVER_TIME_MUST_BE_AT_LEAST_0 = "change-over time must be >= 0";
     public static final String EACH_JOB_MUST_HAVE_AT_LEAST_1_TASK = "each job must have >= 1 task";
@@ -37,21 +36,17 @@ public class MachineShopSimulator {
             throw new MyInputException(NUMBER_OF_MACHINES_AND_JOBS_MUST_BE_AT_LEAST_1);
 
         // create event and machine queues
-        eventList = new EventList(numMachines, largeTime);
-        machines = new Machine[numMachines + 1];
-        for (int i = 1; i <= numMachines; i++)
-            machines[i] = new Machine(i);
+        createEventAndMachines();
 
         // input the change-over times
         System.out.println("Enter change-over times for machines");
-        for (int j = 1; j <= numMachines; j++) {
-            int ct = keyboard.readInteger();
-            if (ct < 0)
-                throw new MyInputException(CHANGE_OVER_TIME_MUST_BE_AT_LEAST_0);
-            getMachine(j).setChangeTime(ct);
-        }
+        setChangeOverTime(keyboard);
 
         // input the jobs
+        setJobs(keyboard);
+    }
+
+    private static void setJobs(MyInputStream keyboard) {
         Job theJob;
         for (int i = 1; i <= numJobs; i++) {
             System.out.println("Enter number of tasks for job " + i);
@@ -64,18 +59,43 @@ public class MachineShopSimulator {
             theJob = new Job(i);
             System.out.println("Enter the tasks (machine, time)"
                     + " in process order");
-            for (int j = 1; j <= tasks; j++) {// get tasks for job i
-                int theMachine = keyboard.readInteger();
-                int theTaskTime = keyboard.readInteger();
-                if (theMachine < 1 || theMachine > numMachines
-                        || theTaskTime < 1)
-                    throw new MyInputException(BAD_MACHINE_NUMBER_OR_TASK_TIME);
-                if (j == 1)
-                    firstMachine = theMachine; // job's first machine
-                theJob.addTask(theMachine, theTaskTime); // add to
-            } // task queue
+            firstMachine = setTasks(keyboard, theJob, tasks); 
+            // task queue
             getMachine(firstMachine).addJob(theJob);
         }
+    }
+
+    private static int setTasks(MyInputStream keyboard, Job theJob, int tasks) {
+        
+        int theMachine, theTaskTime, firstMachine = -1;
+            
+        for (int j = 1; j <= tasks; j++) {// get tasks for job i
+            theMachine = keyboard.readInteger();
+            theTaskTime = keyboard.readInteger();
+            if (theMachine < 1 || theMachine > numMachines
+                    || theTaskTime < 1)
+                throw new MyInputException(BAD_MACHINE_NUMBER_OR_TASK_TIME);
+            if (j == 1)
+                firstMachine = theMachine; // job's first machine
+            theJob.addTask(theMachine, theTaskTime); // add to
+        }
+        return firstMachine;
+    }
+
+    private static void setChangeOverTime(MyInputStream keyboard) {
+        for (int j = 1; j <= numMachines; j++) {
+            int ct = keyboard.readInteger();
+            if (ct < 0)
+                throw new MyInputException(CHANGE_OVER_TIME_MUST_BE_AT_LEAST_0);
+            getMachine(j).setChangeTime(ct);
+        }
+    }
+
+    private static void createEventAndMachines() {
+        eventList = new EventList(numMachines, largeTime);
+        machines = new Machine[numMachines + 1];
+        for (int i = 1; i <= numMachines; i++)
+            machines[i] = new Machine(i);
     }
 
     /** load first jobs onto each machine */
