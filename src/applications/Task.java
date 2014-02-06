@@ -1,5 +1,7 @@
 package applications;
 
+import dataStructures.LinkedQueue;
+
 // top-level nested classes
 public class Task {
     // data members
@@ -12,11 +14,11 @@ public class Task {
         this.time = theTime;
     }
 
-    public int getTime() {
-        return time;
+    public static int removeTask(LinkedQueue taskQ) {
+        return ((Task) taskQ.remove()).time;
     }
 
-    public int getMachineId() {
-        return machineId;
+    public static int getMachineId(LinkedQueue taskQ) {
+         return ((Task) taskQ.getFrontElement()).machineId;
     }
 }

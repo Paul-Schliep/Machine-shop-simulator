@@ -17,8 +17,6 @@ public class Machine {
         this.id = id;
     }
     
-    
-    
     public void checkIdle() {
         // machine is idle, schedule!
         if (MachineShopSimulator.isMachineIdle(id)) {

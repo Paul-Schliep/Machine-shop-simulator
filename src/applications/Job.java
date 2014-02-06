@@ -25,7 +25,7 @@ public class Job {
      * remove next task of job and return its time also update length
      */
     int removeNextTask() {
-        int theTime = ((Task) taskQ.remove()).getTime();
+        int theTime = Task.removeTask(taskQ);
         length += theTime;
         return theTime;
     }
@@ -39,8 +39,7 @@ public class Job {
     boolean moveToNextMachine() {
          if(hasNoActiveTask() == false) return false;
         // get machine for next task with Id
-         int nextMachineId = ((Task) this.taskQ.getFrontElement()).getMachineId();
-         Machine theMachine = MachineShopSimulator.getMachine(nextMachineId);
+         Machine theMachine = MachineShopSimulator.getMachine(Task.getMachineId(taskQ));
          // put on machine p's wait queue
          theMachine.addJob(this);
          this.arrivalTime = MachineShopSimulator.getTimeNow();
