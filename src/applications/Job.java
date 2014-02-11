@@ -3,55 +3,40 @@ package applications;
 import dataStructures.LinkedQueue;
 
 public class Job {
-    // data members
-    private LinkedQueue taskQ; // this job's tasks
-    private int length; // sum of scheduled task times
-    private int arrivalTime; // arrival time at current queue
-    private int id; // job identifier
+    private LinkedQueue taskQ;
+    private int totalTime = 0; // sum of scheduled task times
+    private int arrivalTime = 0; // arrival time at current queue
+    private int id;
 
-    // constructor
     Job(int theId) {
         id = theId;
         taskQ = new LinkedQueue();
-        // length and arrivalTime have default value 0
     }
 
-    // other methods
     void addTask(int theMachine, int theTime) {
         taskQ.put(new Task(theMachine, theTime));
     }
 
-    /**
-     * remove next task of job and return its time also update length
-     */
     int removeNextTask() {
         int theTime = Task.removeTask(taskQ);
-        length += theTime;
+        totalTime += theTime; // update job's totalTime
         return theTime;
     }
     
-    
-    /**
-     * move theJob to machine for its next task
-     * 
-     * @return false iff no next task
-     */
     boolean moveToNextMachine() {
          if(hasNoActiveTask() == false) return false;
-        // get machine for next task with Id
-         Machine theMachine = MachineShopSimulator.getMachine(Task.getMachineId(taskQ));
-         // put on machine p's wait queue
-         theMachine.addJob(this);
+         
+         Machine nextMachine = MachineShopSimulator.getMachine(Task.getMachineId(taskQ));
+         nextMachine.addJob(this);
          this.arrivalTime = MachineShopSimulator.getTimeNow();
-         // if p idle, schedule immediately
-         theMachine.checkIdle();
+         nextMachine.checkIdle();
          return true;
     }
 
 
     private boolean hasNoActiveTask() {
-        if (this.taskQ.isEmpty()) {// no next task
-            MachineShopSimulator.jobDone(id, length);
+        if (this.taskQ.isEmpty()) {
+            MachineShopSimulator.jobFinished(id, totalTime);
             return false;
         }
         return true;

@@ -1,41 +1,35 @@
 package applications;
 
 public class EventList {
-    // data members
-    private int[] finishTime; // finish time array
-    public static final String NUMBER_OF_MACHINES_MUST_BE_AT_LEAST_1 = "number of machines must be >= 1";
+    private int[] finishTimeArray;
+    private static int machineIdle = Integer.MAX_VALUE; // machines that are set to this are idle
 
-    // constructor
-    EventList(int theNumMachines, int theLargeTime) {
-        
-        if (theNumMachines < 1)
-            throw new IllegalArgumentException(NUMBER_OF_MACHINES_MUST_BE_AT_LEAST_1);
-        finishTime = new int[theNumMachines];
 
-        // all machines are idle, initialize with
-        // large finish time
-        for (int i = 0; i < theNumMachines; i++) finishTime[i] = theLargeTime;
+    EventList(int theNumMachines) {
+        if (theNumMachines < 1) throw new IllegalArgumentException("number of machines and jobs must be >= 1");
+        finishTimeArray = new int[theNumMachines];
+
+        // all machines start idle, initialize with large finish time
+        for (int i = 0; i < theNumMachines; i++) finishTimeArray[i] = machineIdle;
     }
 
-    /** @return machine for next event */
-    int nextEventMachine() {
-        // find first machine to finish, this is the
-        // machine with smallest finish time
-        int p = 0;
-        int t = finishTime[0];
-        for (int i = 1; i < finishTime.length; i++)
-            if (finishTime[i] < t) {// i finishes earlier
-                p = i;
-                t = finishTime[i];
+    int nextMachineOnEvent() {
+        // find first machine to finish, this is the machine with smallest finish time
+        int machineId = 0;
+        int finishTime = finishTimeArray[0];
+        for (int i = 1; i < finishTimeArray.length; i++)
+            if (finishTimeArray[i] < finishTime) {// i finishes earlier
+                machineId = i;
+                finishTime = finishTimeArray[i];
             }
-        return p;
+        return machineId;
     }
 
     int nextEventTime(int theMachine) {
-        return finishTime[theMachine];
+        return finishTimeArray[theMachine];
     }
 
     void setFinishTime(int machineId, int theTime) {
-        finishTime[machineId] = theTime;
+        finishTimeArray[machineId] = theTime;
     }
 }

@@ -1,5 +1,3 @@
-/** machine shop simulation */
-
 package applications;
 
 import utilities.MyInputStream;
@@ -7,76 +5,61 @@ import exceptions.MyInputException;
 
 public class MachineShopSimulator {
     
-    public static final String NUMBER_OF_MACHINES_AND_JOBS_MUST_BE_AT_LEAST_1 = "number of machines and jobs must be >= 1";
-    public static final String CHANGE_OVER_TIME_MUST_BE_AT_LEAST_0 = "change-over time must be >= 0";
-    public static final String EACH_JOB_MUST_HAVE_AT_LEAST_1_TASK = "each job must have >= 1 task";
-    public static final String BAD_MACHINE_NUMBER_OR_TASK_TIME = "bad machine number or task time";
-
-   
-  
     // data members of MachineShopSimulator
-    private static int timeNow; // current time
-    private static int numMachines; // number of machines
-    private static int numJobs; // number of jobs
-    private static EventList eventList; // pointer to event list
-    private static Machine[] machines; // array of machines
-    private static int largeTime; // all machines finish before this
-
-    // methods
+    private static int currentTime; 
+    private static int numMachines;
+    private static int numJobs;
+    private static EventList eventList;
+    private static Machine[] machineArray; 
 
     /** input machine shop data */
     static void inputData() {
-        // define the input stream to be the standard input stream
         MyInputStream keyboard = new MyInputStream();
 
         System.out.println("Enter number of machines and jobs");
         numMachines = keyboard.readInteger();
         numJobs = keyboard.readInteger();
         if (numMachines < 1 || numJobs < 1)
-            throw new MyInputException(NUMBER_OF_MACHINES_AND_JOBS_MUST_BE_AT_LEAST_1);
-
-        // create event and machine queues
+            throw new MyInputException("number of machines and jobs must be >= 1");
+        
         createEventAndMachines();
 
-        // input the change-over times
         System.out.println("Enter change-over times for machines");
         setChangeOverTime(keyboard);
 
-        // input the jobs
-        setJobs(keyboard);
+        createAndSetJobs(keyboard);
     }
 
-    private static void setJobs(MyInputStream keyboard) {
+    private static void createAndSetJobs(MyInputStream keyboard) {
         Job theJob;
         for (int i = 0; i < numJobs; i++) {
             System.out.println("Enter number of tasks for job " + (i+1));
-            int tasks = keyboard.readInteger(); // number of tasks
-            int firstMachine = 0; // machine for first task
-            if (tasks < 1)
-                throw new MyInputException(EACH_JOB_MUST_HAVE_AT_LEAST_1_TASK);
+            int firstMachine = 0;
 
             // create the job
             theJob = new Job(i);
             System.out.println("Enter the tasks (machine, time)"
                     + " in process order");
-            firstMachine = setTasks(keyboard, theJob, tasks); 
-            // task queue
-            getMachine(firstMachine).addJob(theJob);
+            firstMachine = setTasks(keyboard, theJob); 
+            // set job
+            machineArray[firstMachine].addJob(theJob);
         }
     }
 
-    private static int setTasks(MyInputStream keyboard, Job theJob, int tasks) {
-        
+    private static int setTasks(MyInputStream keyboard, Job theJob) {
         int theMachine, theTaskTime, firstMachine = -1;
-            
-        for (int i = 0; i < tasks; i++) {// get tasks for job i
+        
+        int numTasks = keyboard.readInteger(); // number of tasks
+        if (numTasks < 1) throw new MyInputException("each job must have >= 1 task");
+        
+        for (int task = 0; task < numTasks; task++) {
             theMachine = keyboard.readInteger()-1;
             theTaskTime = keyboard.readInteger();
-            if (theMachine < 0 || theMachine > numMachines
-                    || theTaskTime < 1)
-                throw new MyInputException(BAD_MACHINE_NUMBER_OR_TASK_TIME);
-            if (i == 0) firstMachine = theMachine; // job's first machine
-            theJob.addTask(theMachine, theTaskTime); // add to
+            if (theMachine < 0 || theMachine > numMachines || theTaskTime < 1) { 
+                throw new MyInputException("bad machine number or task time");
+            }
+            if (task == 0) firstMachine = theMachine; // job's first machine
+            theJob.addTask(theMachine, theTaskTime); // add to job
         }
         return firstMachine;
     }
@@ -85,35 +68,56 @@ public class MachineShopSimulator {
         for (int i = 0; i < numMachines; i++) {
             int ct = keyboard.readInteger();
             if (ct < 0)
-                throw new MyInputException(CHANGE_OVER_TIME_MUST_BE_AT_LEAST_0);
+                throw new MyInputException("change-over time must be >= 0");
             getMachine(i).setChangeTime(ct);
         }
     }
 
     private static void createEventAndMachines() {
-        eventList = new EventList(numMachines, largeTime);
-        machines = new Machine[numMachines];
-        for (int i = 0; i < numMachines; i++) machines[i] = new Machine(i);
+        eventList = new EventList(numMachines);
+        machineArray = new Machine[numMachines];
+        for (int i = 0; i < numMachines; i++) machineArray[i] = new Machine(i);
+    }
+    
+    public static Machine getMachine(int machineNum) {
+        return machineArray[machineNum];
+    }
+    
+    public static int getTimeNow() {
+        return currentTime;
+    }
+    
+    public static void setFinishTime(int machineId, int time) {
+        eventList.setFinishTime(machineId, currentTime + time);
+    }
+    
+    public static void noMoreJobs(int machineId) {
+        eventList.setFinishTime(machineId, Integer.MAX_VALUE);
+    }
+    
+    public static boolean isMachineIdle(int p){
+        return eventList.nextEventTime(p) == Integer.MAX_VALUE;
+    }
+    
+    public static void jobFinished(int jobID, int jobLength){
+        System.out.println("Job " + (jobID+1) + " has completed at " + currentTime + " Total wait was " + (currentTime - jobLength));
     }
 
     /** load first jobs onto each machine */
     static void startShop() {
-        for (int p = 0; p < numMachines; p++){
-            Machine currentMachine = MachineShopSimulator.getMachine(p);
-            currentMachine.changeState();
+        for (Machine machine: machineArray){
+            machine.changeState();
         }
     }
 
     /** process all jobs to completion */
     static void simulate() {
-        while (numJobs > 0) {// at least one job left
-            int nextToFinish = eventList.nextEventMachine();
-            timeNow = eventList.nextEventTime(nextToFinish);
+        while (numJobs > 0) {
+            int nextToFinish = eventList.nextMachineOnEvent();
+            currentTime = eventList.nextEventTime(nextToFinish);
             // change job on machine nextToFinish
-            
-            Machine currentMachine = MachineShopSimulator.getMachine(nextToFinish);
-            
-            Job theJob = currentMachine.changeState();
+                        
+            Job theJob = machineArray[nextToFinish].changeState();
             // move theJob to its next machine
             // decrement numJobs if theJob has finished
             if (theJob != null && !theJob.moveToNextMachine()) numJobs--;
@@ -122,53 +126,19 @@ public class MachineShopSimulator {
 
     /** output wait times at machines */
     static void outputStatistics() {
-        Machine theMachine;
-        System.out.println("Finish time = " + timeNow);
-        for (int p = 0; p < numMachines; p++) {
-            theMachine = machines[p];
-            theMachine.stats();
+        System.out.println("Finish time = " + currentTime);
+        for (Machine machine: machineArray){
+            machine.stats();
         }
     }
-
+    
     /** entry point for machine shop simulator */
     public static void main(String[] args) {
-        largeTime = Integer.MAX_VALUE;
-        /*
-         * It's vital that we (re)set this to 0 because if the simulator is called
-         * multiple times (as happens in the acceptance tests), because timeNow
-         * is static it ends up carrying over from the last time it was run. I'm
-         * not convinced this is the best place for this to happen, though.
-         */
-        timeNow = 0;
+        currentTime = 0;
         inputData(); // get machine and job data
         startShop(); // initial machine loading
         simulate(); // run all jobs through shop
         outputStatistics(); // output machine wait times
-    }
-
-    public static Machine getMachine(int theMachine) {
-        return machines[theMachine];
-    }
-    
-    public static int getTimeNow() {
-        return timeNow;
-    }
-    
-    public static void setFinishTime(int machineId, int time) {
-        eventList.setFinishTime(machineId, timeNow + time);
-    }
-    
-    public static void noMoreJobs(int machineId) {
-        eventList.setFinishTime(machineId, largeTime);
-    }
-    
-    public static boolean isMachineIdle(int p){
-        return eventList.nextEventTime(p) == largeTime;
-    }
-    
-    public static void jobDone(int jobID, int jobLength){
-        System.out.println("Job " + (jobID+1) + " has completed at "
-                + timeNow + " Total wait was " + (timeNow - jobLength));
     }
     
 }

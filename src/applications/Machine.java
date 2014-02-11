@@ -3,42 +3,33 @@ package applications;
 import dataStructures.LinkedQueue;
 
 public class Machine {
-    // data members
-    private LinkedQueue jobQ; // queue of waiting jobs for this machine
-    private int changeTime; // machine change-over time
-    private int totalWait; // total delay at this machine
-    private int numTasks; // number of tasks processed on this machine
-    private Job activeJob; // job currently active on this machine
-    private int id; // the machine's id number
+    private LinkedQueue jobQ;
+    private int changeTime;
+    private int totalWait;
+    private int numTasks;
+    private Job activeJob;
+    private int id;
 
-    // constructor
     public Machine(int id) {
         this.jobQ = new LinkedQueue();
         this.id = id;
     }
     
+    // machine is idle, schedule!
     public void checkIdle() {
-        // machine is idle, schedule!
         if (MachineShopSimulator.isMachineIdle(id)) {
              this.changeState();
          }
     }
     
-    /**
-     * change the state of theMachine
-     * 
-     * @return last job run on this machine
-     */
     public Job changeState() {
         Job lastJob;
         // in idle or change-over state
         if (this.activeJob == null) {
             lastJob = null;
-            // wait over, ready for new job
             this.getNewJob();
         } 
-        // task has just finished on machine[theMachine]
-        // schedule change-over time
+        // task has just finished on machine, schedule change-over time
         else {
             lastJob = this.activeJob;
             this.activeJob = null;
@@ -49,17 +40,11 @@ public class Machine {
     }
 
     private void getNewJob() {
-        // no waiting job
-        if (this.jobQ.isEmpty())
-            MachineShopSimulator.noMoreJobs(id);
+        if (this.jobQ.isEmpty()) MachineShopSimulator.noMoreJobs(id);
         
-        // take job off the queue and work on it
-        else {
-            this.activeJob = (Job) this.jobQ
-                    .remove();
-            this.totalWait = (this.totalWait
-                    + (MachineShopSimulator.getTimeNow()
-                            - this.activeJob.getArrivalTime()));
+        else {// do next job
+            this.activeJob = (Job) this.jobQ.remove();
+            this.totalWait = (this.totalWait + (MachineShopSimulator.getTimeNow() - this.activeJob.getArrivalTime()));
             this.numTasks = (this.numTasks + 1);
             
             int time = this.activeJob.removeNextTask();
@@ -76,10 +61,8 @@ public class Machine {
     }
     
     public void stats() {
-        System.out.println("Machine " + (id+1) + " completed "
-                + numTasks + " tasks");
-        System.out.println("The total wait time was "
-                + totalWait);
+        System.out.println("Machine " + (id+1) + " completed " + numTasks + " tasks");
+        System.out.println("The total wait time was " + totalWait);
         System.out.println();
     }
 }
